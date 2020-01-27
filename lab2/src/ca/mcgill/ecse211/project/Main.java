@@ -9,7 +9,6 @@ import lejos.hardware.Button;
  * The main driver class for the lab.
  */
 public class Main {
-
   /**
    * The main entry point.
    * 

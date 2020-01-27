@@ -61,6 +61,8 @@ public class Odometer implements Runnable {
   // Motor-related variables
   private static int leftMotorTachoCount = 0;
   private static int rightMotorTachoCount = 0;
+  private static int lastleftMotorTachoCount = 0;
+  private static int lastRightMotorTachoCount = 0;
 
   /**
    * The odometer update period in ms.
@@ -95,6 +97,12 @@ public class Odometer implements Runnable {
   public void run() {
     long updateStart;
     long updateDuration;
+    leftMotor.resetTachoCount(); 
+    rightMotor.resetTachoCount(); 
+    lastleftMotorTachoCount=leftMotor.getTachoCount(); 
+    lastleftMotorTachoCount=rightMotor.getTachoCount();
+    
+    double distL, distR, deltaD,deltaT,dX, dY;
 
     while (true) {
       updateStart = System.currentTimeMillis();
@@ -104,8 +112,29 @@ public class Odometer implements Runnable {
 
       // Calculate new robot position based on tachometer counts
       
+      distL = 3.14159*WHEEL_RAD*(leftMotorTachoCount - lastleftMotorTachoCount)/180;
+      distR = 3.14159*WHEEL_RAD*(rightMotorTachoCount - lastRightMotorTachoCount)/180;
+//      distL = 3.14159*WHEEL_RAD* leftMotorTachoCount /180;
+//      distR = 3.14159*WHEEL_RAD* rightMotorTachoCount /180;
+      
+      lastleftMotorTachoCount = leftMotorTachoCount;
+      lastRightMotorTachoCount = rightMotorTachoCount;
+      deltaD = (distL + distR) /2;
+      deltaT = (distL - distR) / BASE_WIDTH; 
+      double [] position = getXyt();
+      
+      double x = position[0], y = position[1], t = position[2] / 57.3;
+//      
+      t = t+ deltaT;
+      
+//      theta = theta + deltaT;
+      dX = deltaD * Math.sin(t);    // compute X component of displacement 
+      dY = deltaD * Math.cos(t);  // compute Y component of displacement X = X + dX;            
+//      x = dX + x;
+//      y = dY + y;
+      deltaT = deltaT *57.3;
       // Update odometer values with new calculated values using update()
-
+      update(dX,dY,deltaT);
       // this ensures that the odometer only runs once every period
       updateDuration = System.currentTimeMillis() - updateStart;
       if (updateDuration < ODOMETER_PERIOD) {
