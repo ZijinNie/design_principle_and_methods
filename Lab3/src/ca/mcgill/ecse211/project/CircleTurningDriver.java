@@ -22,10 +22,10 @@ public class CircleTurningDriver  implements Runnable{
        setAcceleration(ACCELERATION);
 
        // Sleep for 2 seconds
-       sleepFor(TIMEOUT_PERIOD);
+//       sleepFor(TIMEOUT_PERIOD);
 
-       setSpeed(FORWARD_SPEED);
-       moveStraightFor(3);
+//       setSpeed(FORWARD_SPEED);
+//       moveStraightFor(3);
 
        // turn 90 degrees clockwise
        setSpeed(ROTATE_SPEED);

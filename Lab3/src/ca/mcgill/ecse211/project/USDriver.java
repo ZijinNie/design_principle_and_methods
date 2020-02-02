@@ -12,7 +12,7 @@ import static ca.mcgill.ecse211.project.Resources.*;
  * one cycle through the loop is approximately 70 ms. This corresponds to a sampling rate of 1/70ms
  * or about 14 Hz.
  */
-public class USController implements Runnable {
+public class USDriver implements Runnable {
   
   /**
    * The current distance.
@@ -39,12 +39,13 @@ public class USController implements Runnable {
    * The size of the array storing US sensor data
    */
   private float[] usRecord = new float[USRECORD_SIZE];
+
   /**
    * Constructor for an abstract UltrasonicController. It makes the robot move forward.
    */
   private volatile boolean exit = false;
   
-  public USController() {
+  public USDriver() {
     
   }
   
@@ -56,7 +57,7 @@ public class USController implements Runnable {
    */
   public void run() {
     int i = 0;
-    while(!exit) {
+    while(!exit || i<USRECORD_SIZE) {
       usRecord[i] = readUsDistance();
       i++;
       try {
@@ -109,4 +110,13 @@ public class USController implements Runnable {
   public void stop() {
     exit = true;
   }
+  public float[] getUsRecord() {
+    return usRecord;
+  }
+
+
+  public void setUsRecord(float[] usRecord) {
+    this.usRecord = usRecord;
+  }
+
 }

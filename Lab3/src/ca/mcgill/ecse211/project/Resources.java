@@ -23,7 +23,7 @@ public class Resources {
   /**
    * The robot width in centimeters.
    */
-  public static final double BASE_WIDTH = 15.1;
+  public static final double BASE_WIDTH = 15.5;
   
   /**
    * The speed at which the robot moves forward in degrees per second.
@@ -75,6 +75,12 @@ public class Resources {
    * The limit of invalid samples that we read from the US sensor before assuming no obstacle.
    */
   public static final int INVALID_SAMPLE_LIMIT = 20;
+  
+//  /**
+//   * The odometer.
+//   */
+//  public static Odometer odometer = Odometer.getOdometer();
+//  
   /**
    * The Ultrasonic Sensor
    */

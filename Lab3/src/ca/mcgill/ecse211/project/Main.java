@@ -15,24 +15,27 @@ public class Main {
    * @param args not used
    */
   public static void main(String[] args) {
-    Printer.printMainMenu();
-    
+    float[] record; 
+
+//    Printer.printMainMenu();
+    USDriver usDriver= new USDriver();
+    CircleTurningDriver circleturningDriver = new CircleTurningDriver();
+    Thread usThread = new Thread(usDriver);
+
+    Thread driverThread = new Thread(circleturningDriver);
     while(Button.waitForAnyPress() != Button.ID_ENTER);
-    
+
     
 //    new Thread(new Display()).start();
-    USController newController= new USController();
-    CircleTurningDriver newDriver = new CircleTurningDriver();
-    Thread usThread = new Thread(newController);
     usThread.start();
-    Thread driverThread = new Thread(newDriver);
     driverThread.start();
     
     sleepFor(1000);
     
-    while(!newDriver.isStopped());
-    newController.stop();
+    while(!circleturningDriver.isStopped());
+    usDriver.stop();
     
+    record = usDriver.getUsRecord();
     
     
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
@@ -41,35 +44,6 @@ public class Main {
     System.exit(0);
   }
 
-  /**
-   * Floats the motors.
-   */
-  public static void floatMotors() {
-    leftMotor.forward();
-    leftMotor.flt();
-    rightMotor.forward();
-    rightMotor.flt();
-  }
-
-  /**
-   * Asks the user whether the motors should drive in a square or float.
-   * 
-   * @return the user choice
-   */
-  private static int chooseDriveInSquareOrFloatMotors() {
-    int buttonChoice;
-    Display.showText("< Left | Right >",
-                     "       |        ",
-                     " Float | Drive  ",
-                     "motors | in a   ",
-                     "       | square ");
-    
-    do {
-      buttonChoice = Button.waitForAnyPress(); // left or right press
-    } while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
-    return buttonChoice;
-  }
-  
   /**
    * Sleeps current thread for the specified duration.
    * 
