@@ -23,8 +23,8 @@ public class Main {
     Thread usThread = new Thread(usDriver);
 
     Thread driverThread = new Thread(circleturningDriver);
+    
     while(Button.waitForAnyPress() != Button.ID_ENTER);
-
     
 //    new Thread(new Display()).start();
     usThread.start();
@@ -36,6 +36,7 @@ public class Main {
     usDriver.stop();
     
     record = usDriver.getUsRecord();
+    
     
     
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
