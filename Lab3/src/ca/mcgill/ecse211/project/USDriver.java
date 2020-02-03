@@ -45,6 +45,10 @@ public class USDriver implements Runnable {
    */
   private volatile boolean exit = false;
   
+  private volatile float xDist ;
+  
+  private volatile float yDist;
+  
   public USDriver() {
     
   }
