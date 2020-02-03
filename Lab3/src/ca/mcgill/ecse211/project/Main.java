@@ -37,6 +37,12 @@ public class Main {
     
     record = usDriver.getUsRecord();
     
+    SignalAnalyzer sa = new SignalAnalyzer(10,record);
+    
+    int angle = sa.getInitialAngle();
+    
+    System.out.println(angle);
+    
     
     
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
