@@ -8,7 +8,11 @@ import static ca.mcgill.ecse211.project.Resources.*;
  */
 public class CircleTurningDriver  implements Runnable{
 
-  private boolean isStopped;
+  private volatile boolean isStopped;
+  private volatile boolean startHeadingDes;
+  private volatile int turningAngle;
+  private volatile float xDistance;
+  private volatile float yDistance;
    
   /**
    * Drives the robot in a square of size 3x3 Tiles. It is to be run in parallel
@@ -16,7 +20,7 @@ public class CircleTurningDriver  implements Runnable{
    */
 
    public void run() {
-       
+       startHeadingDes = false;
         // reset the motors
        stopMotors();
        setAcceleration(ACCELERATION);
@@ -31,7 +35,36 @@ public class CircleTurningDriver  implements Runnable{
        setSpeed(ROTATE_SPEED);
        turnBy(360.0);
        
+       while(!startHeadingDes);
+       
+       if(turningAngle>180) {
+         turnBy(360-turningAngle);
+       }
+       else turnBy(turningAngle);
+       
+       
+       moveStraightFor(yDistance);
+       turnBy(90);
+       moveStraightFor(xDistance);
    }
+  public int getTurningAngle() {
+    return turningAngle;
+  }
+  public void setTurningAngle(int turningAngle) {
+    this.turningAngle = turningAngle;
+  }
+  public float getxDistance() {
+    return xDistance;
+  }
+  public void setxDistance(float xDistance) {
+    this.xDistance = xDistance;
+  }
+  public float getyDistance() {
+    return yDistance;
+  }
+  public void setyDistance(float yDistance) {
+    this.yDistance = yDistance;
+  }
   /**
    * Moves the robot straight for the given distance.
    * 
@@ -120,5 +153,12 @@ public class CircleTurningDriver  implements Runnable{
   public void setStopped(boolean isStopped) {
     this.isStopped = isStopped;
   }
-
+  public boolean isStartHeadingDes() {
+    return startHeadingDes;
+  }
+  public void setStartHeadingDes(boolean startHeadingDes) {
+    this.startHeadingDes = startHeadingDes;
+  }
+  
+  
 }

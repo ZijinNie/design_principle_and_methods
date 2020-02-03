@@ -1,10 +1,7 @@
 package ca.mcgill.ecse211.project;
 
-//static import to avoid duplicating variables and make the code easier to read
-import static ca.mcgill.ecse211.project.Resources.*;
-
 import lejos.hardware.Button;
-
+import ca.mcgill.ecse211.project.USDriver;
 /**
  * The main driver class for the lab.
  */
@@ -33,16 +30,24 @@ public class Main {
     sleepFor(1000);
     
     while(!circleturningDriver.isStopped());
-    usDriver.stop();
     
     record = usDriver.getUsRecord();
-    
+    usDriver.stop();
     SignalAnalyzer sa = new SignalAnalyzer(10,record);
     
     int angle = sa.getInitialAngle();
+    float xDist = 10;
+    float yDist = 10;
     
     System.out.println(angle);
     
+    while (Button.waitForAnyPress() != Button.ID_ENTER);
+    
+    circleturningDriver.setTurningAngle( (angle+135)%360 );
+    circleturningDriver.setxDistance(xDist);
+    circleturningDriver.setyDistance(yDist);
+    
+    circleturningDriver.setStartHeadingDes(true);
     
     
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {

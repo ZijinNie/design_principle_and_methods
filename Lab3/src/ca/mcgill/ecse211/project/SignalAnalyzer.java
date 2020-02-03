@@ -55,6 +55,7 @@ public float[] smoothArray(float[] input) {
     input[index] = sum/(2*left+1);
     sum = 0;
   }
+  System.out.println(input);
   return input;
 }
 
