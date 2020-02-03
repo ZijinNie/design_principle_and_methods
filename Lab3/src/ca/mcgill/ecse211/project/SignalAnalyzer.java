@@ -32,6 +32,7 @@ public class SignalAnalyzer {
     }
     float[] array = Arrays.copyOf(rawRecord, num-4);
     truncRecord = array;
+    System.out.println(Arrays.toString(truncRecord));
   }
 
 //  private void getStandardDev(float[] array) {
@@ -41,6 +42,7 @@ public class SignalAnalyzer {
 //  }
 
 public float[] smoothArray(float[] input) {
+  System.out.println("Smoothed array: ");
   float[] dup = Arrays.copyOf(input, input.length);
   int index = 0;
   int length = input.length;
@@ -49,12 +51,14 @@ public float[] smoothArray(float[] input) {
   int right = smoothGroupNumber/2;
   int sum = 0;
   for(index =0; index< input.length; index++) {
-    for(int i = 0; i < left; i++) {
-      sum += dup[(-i+length)%length]+ dup[(-i+length)%length];
+    for(int i = 1; i <= left; i++) {
+      sum += dup[(-i+index+length)%length]+ dup[(i+index+length)%length];
     }
+    sum += dup[index];
     input[index] = sum/(2*left+1);
     sum = 0;
   }
+  System.out.println(Arrays.toString(input));
   return input;
 }
 

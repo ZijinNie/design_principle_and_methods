@@ -33,7 +33,8 @@ public class Main {
     sleepFor(1000);
     
     while(!circleturningDriver.isStopped());
-    usDriver.stop();
+//    usDriver.stop();
+    driverThread.stop();
     
     record = usDriver.getUsRecord();
     
@@ -43,7 +44,9 @@ public class Main {
     
     System.out.println(angle);
     
+    while(Button.waitForAnyPress() != Button.ID_ENTER);
     
+//    driverThread
     
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
     } // do nothing
