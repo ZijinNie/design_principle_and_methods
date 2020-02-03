@@ -43,10 +43,17 @@ public class SigalAnalyzer {
   public float[] smoothArray(float[] input) {
     float[] dup = Arrays.copyOf(input, input.length);
     int index = 0;
+    int length = input.length;
+    int smoothGroupNumber = 10;
+    int left = smoothGroupNumber/2;
+    int right = smoothGroupNumber/2;
+    int sum = 0;
     for(index =0; index< input.length; index++) {
-      if(index != 0 && index != input.length-1) {
-        input[index] = (dup[index-1]+dup[index]+dup[index+1])/3;
+      for(int i = 0; i < left; i++) {
+        sum += dup[(-i+length)%length]+ dup[(-i+length)%length];
       }
+      input[index] = sum/(2*left+1);
+      sum = 0;
     }
     return input;
   }
@@ -71,6 +78,9 @@ public class SigalAnalyzer {
     }
     return 0;
   }
+  
+  
+  
   
   
   public float getMean(float[] array) {
