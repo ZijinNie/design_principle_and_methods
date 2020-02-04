@@ -1,0 +1,93 @@
+package ca.mcgill.ecse211.project;
+
+import lejos.hardware.Button;
+import static ca.mcgill.ecse211.project.Resources.TURNING_THRESHOLD;
+import ca.mcgill.ecse211.project.USDriver;
+/**
+ * The main driver class for the lab.
+ */
+public class Main {
+  /**
+   * The main entry point.
+   * 
+   * @param args not used
+   */
+  public static void main(String[] args) {
+
+    float cur;
+    float prev;
+    float firstAngle = 0, secondAngle= 0;
+    int count = 0;
+//    Printer.printMainMenu();
+    USDriver usDriver= new USDriver();
+    CircleTurningDriver circleturningDriver = new CircleTurningDriver();
+    Thread usThread = new Thread(usDriver);
+//    Thread driverThread = new Thread(circleturningDriver);
+    Thread odo = new Thread(Resources.odometer);
+    while(Button.waitForAnyPress() != Button.ID_ENTER);
+    
+//    new Thread(new Display()).start();
+    usThread.start();
+//    driverThread.start();
+    odo.start(); 
+    
+    cur = usDriver.getCurDist();
+    prev = usDriver.getCurDist();
+    
+    CircleTurningDriver.turnClockwise();
+
+    while( Button.waitForAnyPress() != Button.ID_ENTER) {
+      
+      cur = usDriver.getCurDist();
+      
+      if((cur<= TURNING_THRESHOLD && prev >= TURNING_THRESHOLD) ||
+         (cur>= TURNING_THRESHOLD && prev <= TURNING_THRESHOLD)) {
+        
+        count +=1;
+        if(count ==0) {
+          firstAngle = (float)Resources.odometer.getXyt()[2];
+        }
+        else {
+          secondAngle = (float)Resources.odometer.getXyt()[2];
+          CircleTurningDriver.stopMotors();
+          usDriver.stop();
+          break;
+        }
+      }
+      
+      prev = cur;
+    }
+
+    float dTheta = (firstAngle < secondAngle) ? 45 - (firstAngle - secondAngle) /2 : 225 - ( firstAngle - secondAngle)/2;
+    
+    float minDist = usDriver.getMinDist();
+
+    circleturningDriver.turnBy(dTheta);
+    while (Button.waitForAnyPress() != Button.ID_ENTER);
+    
+
+//    circleturningDriver.
+
+    
+//    driverThread
+    
+    while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
+    } // do nothing
+    
+    System.exit(0);
+  }
+
+  /**
+   * Sleeps current thread for the specified duration.
+   * 
+   * @param duration sleep duration in milliseconds
+   */
+  public static void sleepFor(long duration) {
+    try {
+      Thread.sleep(duration);
+    } catch (InterruptedException e) {
+      // There is nothing to be done here
+    }
+  }
+  
+}

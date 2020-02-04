@@ -1,0 +1,10 @@
+package ca.mcgill.ecse211.project;
+
+public class SigalAnalyzer {
+  
+  private int usSamplingRate;
+  
+  public SigalAnalyzer(int usSamplingRate){
+    this.usSamplingRate = usSamplingRate;
+  }
+}

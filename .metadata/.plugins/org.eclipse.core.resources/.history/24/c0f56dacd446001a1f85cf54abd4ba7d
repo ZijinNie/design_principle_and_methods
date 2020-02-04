@@ -1,0 +1,97 @@
+package ca.mcgill.ecse211.project;
+
+import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.internal.ev3.EV3Audio;
+import static ca.mcgill.ecse211.project.Resources.TURNING_THRESHOLD;
+import ca.mcgill.ecse211.project.USDriver;
+/**
+ * The main driver class for the lab.
+ */
+public class Main {
+  /**
+   * The main entry point.
+   * 
+   * @param args not used
+   */
+  public static void main(String[] args) {
+
+    float cur;
+    float prev;
+    float firstAngle = 0, secondAngle= 0;
+    int count = 0;
+    Sound.beep();
+    USDriver usDriver= new USDriver();
+    Thread usThread = new Thread(usDriver);
+    Thread odo = new Thread(Resources.odometer);
+    while(Button.waitForAnyPress() != Button.ID_ENTER);
+    
+    usThread.start();
+    odo.start(); 
+    
+    cur = usDriver.getCurDist();
+    prev = usDriver.getCurDist();
+    
+    CircleTurningDriver.rotateClockwise();
+//    int i = 0;
+//    while(true) {
+//      
+//      cur = usDriver.getCurDist();
+//      System.out.println( i++);
+//      if((cur<= TURNING_THRESHOLD && prev >= TURNING_THRESHOLD) ||
+//         (cur>= TURNING_THRESHOLD && prev <= TURNING_THRESHOLD)) {
+//        
+//        if(count ==0) {
+//          firstAngle = (float)Resources.odometer.getXyt()[2];
+//          Sound.beep();
+//        }
+//        else {
+//          secondAngle = (float)Resources.odometer.getXyt()[2];
+//          CircleTurningDriver.stopMotors();
+//          usDriver.stop();
+//          break;
+//        }
+//        count +=1;
+//      }
+//      if(Button.waitForAnyPress() == Button.ID_ENTER) break;
+//      prev = cur;
+////      Thread.sleep(10);
+//    }
+    while(!usDriver.isExit());
+    
+    float dTheta = (firstAngle < secondAngle) ? 45 - (firstAngle - secondAngle) /2 : 225 - ( firstAngle - secondAngle)/2;
+    
+    System.out.println(dTheta);
+
+    
+    float minDist = usDriver.getMinDist();
+
+    CircleTurningDriver.turnBy(dTheta);
+    while (Button.waitForAnyPress() != Button.ID_ENTER);
+    
+
+//    circleturningDriver.
+
+    
+//    driverThread
+    
+    while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
+    } // do nothing
+    
+    System.exit(0);
+  }
+
+  /**
+   * Sleeps current thread for the specified duration.
+   * 
+   * @param duration sleep duration in milliseconds
+   */
+  public static void sleepFor(long duration) {
+    try {
+      Thread.sleep(duration);
+    } catch (InterruptedException e) {
+      // There is nothing to be done here
+    }
+  }
+  
+}

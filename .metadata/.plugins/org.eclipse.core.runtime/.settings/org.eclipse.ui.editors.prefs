@@ -1,0 +1,15 @@
+AbstractTextEditor.Color.Background=0,0,0
+STS4BootMarkerIndicationColor=56,84,26
+eclipse.preferences.version=1
+lineNumberRuler=true
+net.sf.eclipsecs.info.text.style=NONE
+net.sf.eclipsecs.warning.color=128,128,0
+net.sf.eclipsecs.warning.text.style=NONE
+overviewRuler_migration=migrated_3.1
+printMargin=true
+printMarginAllowOverride=true
+printMarginColumn=120
+showWhitespaceCharacters=true
+spacesForTabs=true
+spellingEnabled=true
+whitespaceCharacterAlphaValue=25

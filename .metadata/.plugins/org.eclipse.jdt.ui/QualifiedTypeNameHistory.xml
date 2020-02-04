@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="lejos.hardware.Button"/>
+<fullyQualifiedTypeName name="lejos.hardware.sensor.SensorModes"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="ca.mcgill.ecse211.project.USDriver"/>
+<fullyQualifiedTypeName name="java.lang.Float"/>
+<fullyQualifiedTypeName name="lejos.internal.ev3.EV3Audio"/>
+<fullyQualifiedTypeName name="lejos.hardware.Sound"/>
+</qualifiedTypeNameHistroy>
