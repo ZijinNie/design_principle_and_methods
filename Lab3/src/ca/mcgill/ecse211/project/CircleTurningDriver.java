@@ -6,7 +6,7 @@ import static ca.mcgill.ecse211.project.Resources.*;
 /**
  * This class is used to drive the robot on the demo floor.
  */
-public class CircleTurningDriver  implements Runnable{
+public class CircleTurningDriver{
 
   private volatile boolean isStopped;
   private volatile boolean startHeadingDes;
@@ -19,36 +19,46 @@ public class CircleTurningDriver  implements Runnable{
    * with the odometer thread to allow testing its functionality.
    */
 
-   public void run() {
-       startHeadingDes = false;
-        // reset the motors
-       stopMotors();
-       setAcceleration(ACCELERATION);
-
-       // Sleep for 2 seconds
-//       sleepFor(TIMEOUT_PERIOD);
-
-//       setSpeed(FORWARD_SPEED);
-//       moveStraightFor(3);
-
-       // turn 90 degrees clockwise
-       setSpeed(ROTATE_SPEED);
-       turnBy(360.0);
-       
-
-       while(!startHeadingDes);
-       
-       if(turningAngle>180) {
-         turnBy(360-turningAngle);
-       }
-       else turnBy(turningAngle);
-       
-       
-       moveStraightFor(yDistance);
-       turnBy(90);
-       moveStraightFor(xDistance);
-
-   }
+//   public void run() {
+//       startHeadingDes = false;
+//        // reset the motors
+//       stopMotors();
+//       setAcceleration(ACCELERATION);
+//
+//       // Sleep for 2 seconds
+////       sleepFor(TIMEOUT_PERIOD);
+//
+////       setSpeed(FORWARD_SPEED);
+////       moveStraightFor(3);
+//
+//       // turn 90 degrees clockwise
+//       setSpeed(ROTATE_SPEED);
+//       leftMotor.forward();
+//       rightMotor.backward();
+////       turnBy(360.0);
+//       setStopped(true);
+//       while(!startHeadingDes);
+//       
+//       if(turningAngle>180) {
+//         turnBy(360-turningAngle);
+//       }
+//       else turnBy(turningAngle);
+//       
+//       
+//       moveStraightFor(yDistance);
+//       turnBy(90);
+//       moveStraightFor(xDistance);
+//       turnBy(-90);
+//   }
+   
+  public static void rotateClockwise() {
+    stopMotors();
+    setAcceleration(ACCELERATION);
+    setSpeed(ROTATE_SPEED);
+    leftMotor.forward();
+    rightMotor.backward();
+  }
+  
   public int getTurningAngle() {
     return turningAngle;
   }
@@ -72,9 +82,14 @@ public class CircleTurningDriver  implements Runnable{
    * 
    * @param distance in feet (tile sizes), may be negative
    */
-  public static void moveStraightFor(double distance) {
+  public static void moveStraightForTile(double distance) {
     leftMotor.rotate(convertDistance(distance * TILE_SIZE), true);
     rightMotor.rotate(convertDistance(distance * TILE_SIZE), false);
+  }
+  
+  public static void moveStraightFor(double distance) {
+    leftMotor.rotate(convertDistance(distance), true);
+    rightMotor.rotate(convertDistance(distance), false);
   }
   
   /**
@@ -85,10 +100,9 @@ public class CircleTurningDriver  implements Runnable{
    * 
    * @param angle the angle by which to turn, in degrees
    */
-  public void turnBy(double angle) {
+  public static void turnBy(double angle) {
     leftMotor.rotate(convertAngle(angle), true);
     rightMotor.rotate(-convertAngle(angle), false);
-    setStopped(true);
   }
   
   /**

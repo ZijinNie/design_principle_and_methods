@@ -1,5 +1,6 @@
 package ca.mcgill.ecse211.project;
 
+
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -23,7 +24,7 @@ public class Resources {
   /**
    * The robot width in centimeters.
    */
-  public static final double BASE_WIDTH = 14.65;
+  public static final double BASE_WIDTH = 14.50;
   
   /**
    * The speed at which the robot moves forward in degrees per second.
@@ -33,7 +34,7 @@ public class Resources {
   /**
    * The speed at which the robot rotates in degrees per second.
    */
-  public static final int ROTATE_SPEED = 100;
+  public static final int ROTATE_SPEED = 50;
   
   /**
    * The motor acceleration in degrees per second squared.
@@ -66,6 +67,7 @@ public class Resources {
    */
   public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(MotorPort.D);
   
+  
   /**
    * The LCD.
    */
@@ -76,11 +78,15 @@ public class Resources {
    */
   public static final int INVALID_SAMPLE_LIMIT = 20;
   
-//  /**
-//   * The odometer.
-//   */
-//  public static Odometer odometer = Odometer.getOdometer();
-//  
+  public static final float TURNING_THRESHOLD = 17;
+  
+  public static final float ZONE_THRESHOLD = (float) 0.5;
+  
+  /**
+   * The odometer.
+   */
+  public static final Odometer odometer = Odometer.getOdometer();
+  
   /**
    * The Ultrasonic Sensor
    */

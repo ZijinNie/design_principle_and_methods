@@ -1,6 +1,9 @@
 package ca.mcgill.ecse211.project;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
+import lejos.internal.ev3.EV3Audio;
+import static ca.mcgill.ecse211.project.Resources.*;
 import ca.mcgill.ecse211.project.USDriver;
 /**
  * The main driver class for the lab.
@@ -12,48 +15,42 @@ public class Main {
    * @param args not used
    */
   public static void main(String[] args) {
-    float[] record; 
 
-//    Printer.printMainMenu();
+    
+    Sound.beep();
     USDriver usDriver= new USDriver();
-    CircleTurningDriver circleturningDriver = new CircleTurningDriver();
     Thread usThread = new Thread(usDriver);
-
-    Thread driverThread = new Thread(circleturningDriver);
+    Thread odo = new Thread(Resources.odometer);
     
     while(Button.waitForAnyPress() != Button.ID_ENTER);
     
-//    new Thread(new Display()).start();
     usThread.start();
-    driverThread.start();
+    odo.start(); 
+    new Thread(new Display()).start();
     
+    leftMotor.setSpeed(ROTATE_SPEED);
+    rightMotor.setSpeed(ROTATE_SPEED);
+    
+//    CircleTurningDriver.turnBy(360);
+    CircleTurningDriver.rotateClockwise();
+
+    while(!usDriver.isExit());
     sleepFor(1000);
+    double firstAngle = usDriver.getFirstAngle(), secondAngle= usDriver.getSecondAngle();
+    double dTheta = (firstAngle < secondAngle) ?  215 - (secondAngle - firstAngle) /2  : 135 - ( firstAngle - secondAngle)/2;
     
-    while(!circleturningDriver.isStopped());
+    System.out.println(firstAngle + "     "+ secondAngle);
+    System.out.println(dTheta);
 
     
-    record = usDriver.getUsRecord();
-    usDriver.stop();
-    SignalAnalyzer sa = new SignalAnalyzer(10,record);
-    
-    int angle = sa.getInitialAngle();
-    float xDist = 10;
-    float yDist = 10;
-    
-    System.out.println(angle);
-    
-
+    double minDist = usDriver.getMinDist();
+    System.out.println("Forward" + (TILE_SIZE-minDist-2));
+    CircleTurningDriver.turnBy(dTheta);
     while (Button.waitForAnyPress() != Button.ID_ENTER);
     
-    circleturningDriver.setTurningAngle( (angle+135)%360 );
-    circleturningDriver.setxDistance(xDist);
-    circleturningDriver.setyDistance(yDist);
-    
-    circleturningDriver.setStartHeadingDes(true);
-
-    
-//    driverThread
-    
+    CircleTurningDriver.moveStraightFor(TILE_SIZE-minDist   -2    );
+    CircleTurningDriver.turnBy(90);
+    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist    -2    );
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
     } // do nothing
     

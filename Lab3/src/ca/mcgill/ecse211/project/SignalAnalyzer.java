@@ -96,6 +96,7 @@ public float[] smoothArray(float[] input) {
   }
 
 
+
   public float getMean(float[] array) {
     float sum = 0;
     for(float i: array) {

@@ -1,6 +1,10 @@
 package ca.mcgill.ecse211.project;
 
 import static ca.mcgill.ecse211.project.Resources.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import lejos.hardware.Sound;
 
 
 /**
@@ -15,19 +19,30 @@ import static ca.mcgill.ecse211.project.Resources.*;
 public class USDriver implements Runnable {
   
   /**
-   * The current distance.
-   */
-  
-  private int curDistance;
-  /**
    * The distance remembered by the {@code filter()} method.
    */
-  private int prevDistance;
+  private double prevDistance;
   
   /**
    * The number of invalid samples seen by {@code filter()} so far.
    */
   private int invalidSampleCount;
+  
+//Thread control tools
+ /**
+  * Fair lock for concurrent writing.
+  */
+ private static Lock lock = new ReentrantLock(true);
+ 
+ /**
+  * Indicates if a thread is trying to reset any position parameters.
+  */
+ private volatile boolean isResetting = false;
+
+ /**
+  * Lets other threads know that a reset operation is over.
+  */
+ private Condition doneResetting = lock.newCondition();
   
   /**
    * Buffer (array) to store US samples. Declared as an instance variable to avoid creating a new
@@ -35,19 +50,17 @@ public class USDriver implements Runnable {
    */
   private float[] usData = new float[usSensor.sampleSize()];
   
-  /**
-   * The size of the array storing US sensor data
-   */
-  private float[] usRecord = new float[USRECORD_SIZE];
 
   /**
    * Constructor for an abstract UltrasonicController. It makes the robot move forward.
    */
   private volatile boolean exit = false;
   
-  private volatile float xDist ;
+  private volatile double minDist;
   
-  private volatile float yDist;
+  private volatile double curDist;
+  
+  private double firstAngle, secondAngle;
   
   public USDriver() {
     
@@ -60,67 +73,172 @@ public class USDriver implements Runnable {
    * @see java.lang.Thread#run()
    */
   public void run() {
-    int i = 0;
-    while(!exit || i<USRECORD_SIZE) {
-      usRecord[i] = readUsDistance();
-      i++;
+    
+    minDist = Double.MAX_VALUE;
+    double cur;
+    int count = 0;
+    double highzone = TURNING_THRESHOLD + ZONE_THRESHOLD;
+    double lowzone = TURNING_THRESHOLD - ZONE_THRESHOLD;
+//    double highzone = 75;
+//    double lowzone = 65;
+    double inAngle = 0 , outAngle = 0;
+    boolean isIn = false;
+    boolean isEnterFromUp = false;
+    firstAngle = 0;
+    secondAngle= 0;
+    
+    while(!exit) {
+      cur = readUsDistance();
+      System.out.println(cur);
+      
+      if(cur<minDist && minDist>5) minDist = cur;
+      
+      if(!isIn && lowzone<cur && cur<highzone) {
+        
+       if(cur > TURNING_THRESHOLD) {
+            isEnterFromUp = true;
+          }
+       isIn = true;
+       inAngle = Resources.odometer.getXyt()[2];
+        
+      }else if(isIn){
+        
+        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
+          
+          isIn = false;
+          outAngle = Resources.odometer.getXyt()[2];
+          
+          if(count == 0) {
+            Sound.beep();
+            firstAngle = (inAngle + outAngle)/2;
+            
+          }else{
+            secondAngle = Resources.odometer.getXyt()[2];
+            CircleTurningDriver.stopMotors();
+            stop();
+          }
+          count +=1;
+        }
+      }
+      
       try {
-        Thread.sleep(100); // make the sensor sampling frequency be 10/s
+        Thread.sleep(50); // make the sensor sampling frequency be 20/s
       } catch (InterruptedException e) {
       }
+      
     }
+    
+    
   }
+
+  public boolean isExit() {
+    return exit;
+  }
+
+
+  public void setExit(boolean exit) {
+    this.exit = exit;
+  }
+
+
+  public double getFirstAngle() {
+    return firstAngle;
+  }
+
+
+  public void setFirstAngle(double firstAngle) {
+    this.firstAngle = firstAngle;
+  }
+
+
+  public double getSecondAngle() {
+    return secondAngle;
+  }
+
+
+  public void setSecondAngle(double secondAngle) {
+    this.secondAngle = secondAngle;
+  }
+
+
+  public double getMinDist() {
+    return minDist;
+  }
+
+
+  public void setMinDist(double minDist) {
+    this.minDist = minDist;
+  }
+
 
   /**
    * Returns the filtered distance between the US sensor and an obstacle in cm.
    * 
    * @return the filtered distance between the US sensor and an obstacle in cm
    */
-  public int readUsDistance() {
+  public double readUsDistance() {
     usSensor.fetchSample(usData, 0);
     // extract from buffer, convert to cm, cast to int, and filter
-    return filter((int) (usData[0] * 100.0));
+    return filter((double) (usData[0] * 100.0));
   }
   
   /**
    * Rudimentary filter - toss out invalid samples corresponding to null signal.
    * 
-   * @param distance raw distance measured by the sensor in cm
+   * @param d raw distance measured by the sensor in cm
    * @return the filtered distance in cm
    */
-  int filter(int distance) {
-    if (distance >= 255 && invalidSampleCount < INVALID_SAMPLE_LIMIT) {
+  double filter(double d) {
+    if ((d >= 255 ||d < 5)&& invalidSampleCount < INVALID_SAMPLE_LIMIT) {
       // bad value, increment the filter value and return the distance remembered from before
       invalidSampleCount++;
       return prevDistance;
     } else {
-      if (distance < 255) {
+      if (d < 255) {
         // distance went below 255: reset filter and remember the input distance.
         invalidSampleCount = 0;
       }
-      prevDistance = distance;
-      return distance;
+      prevDistance = d;
+      return d;
     }
   }
 
-  public int getCurDistance() {
-    return curDistance;
-  }
-
-  public void setCurDistance(int curDistance) {
-    this.curDistance = curDistance;
-  }
   
   public void stop() {
     exit = true;
   }
-  public float[] getUsRecord() {
-    return usRecord;
+
+
+
+  public double getCurDist() {    
+    double cur = 0;
+    lock.lock();
+    try {
+      while (isResetting) { // If a reset operation is being executed, wait until it is over.
+        doneResetting.await(); // Using await() is lighter on the CPU than simple busy wait.
+      }
+      cur = curDist;
+        
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } finally {
+      lock.unlock();
+    }
+
+      return cur;
   }
 
 
-  public void setUsRecord(float[] usRecord) {
-    this.usRecord = usRecord;
+  public void setCurDist(double dist) {
+    lock.lock();
+    isResetting = true;
+    try {
+      this.curDist = dist;
+      isResetting = false;
+      doneResetting.signalAll();
+    } finally {
+      lock.unlock();
+    }
   }
 
 }
