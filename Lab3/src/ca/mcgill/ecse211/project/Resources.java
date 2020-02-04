@@ -80,7 +80,7 @@ public class Resources {
   
   public static final float TURNING_THRESHOLD = 17;
   
-  public static final float ZONE_THRESHOLD = (float) 0.5;
+  public static final float ZONE_THRESHOLD = (float) 1;
   
   /**
    * The odometer.

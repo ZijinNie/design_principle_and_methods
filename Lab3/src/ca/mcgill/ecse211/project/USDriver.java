@@ -61,7 +61,7 @@ public class USDriver implements Runnable {
   private volatile double curDist;
   
   private double firstAngle, secondAngle;
-  
+  private boolean isFirstUpRising;
   public USDriver() {
     
   }
@@ -76,6 +76,7 @@ public class USDriver implements Runnable {
     
     minDist = Double.MAX_VALUE;
     double cur;
+    double prev;
     int count = 0;
     double highzone = TURNING_THRESHOLD + ZONE_THRESHOLD;
     double lowzone = TURNING_THRESHOLD - ZONE_THRESHOLD;
@@ -87,6 +88,7 @@ public class USDriver implements Runnable {
     firstAngle = 0;
     secondAngle= 0;
     
+    prev = readUsDistance();
     while(!exit) {
       cur = readUsDistance();
       System.out.println(cur);
@@ -95,9 +97,13 @@ public class USDriver implements Runnable {
       
       if(!isIn && lowzone<cur && cur<highzone) {
         
-       if(cur > TURNING_THRESHOLD) {
+       if(prev > highzone) {
             isEnterFromUp = true;
-          }
+            
+            if(count == 0) {isFirstUpRising = false;}
+       }else {
+         if(count == 0) {isFirstUpRising = true;}
+       }
        isIn = true;
        inAngle = Resources.odometer.getXyt()[2];
         
@@ -239,6 +245,16 @@ public class USDriver implements Runnable {
     } finally {
       lock.unlock();
     }
+  }
+
+
+  public boolean isFirstUpRising() {
+    return isFirstUpRising;
+  }
+
+
+  public void setFirstUpRising(boolean isFirstUpRising) {
+    this.isFirstUpRising = isFirstUpRising;
   }
 
 }

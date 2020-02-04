@@ -37,7 +37,8 @@ public class Main {
     while(!usDriver.isExit());
     sleepFor(1000);
     double firstAngle = usDriver.getFirstAngle(), secondAngle= usDriver.getSecondAngle();
-    double dTheta = (firstAngle < secondAngle) ?  215 - (secondAngle - firstAngle) /2  : 135 - ( firstAngle - secondAngle)/2;
+    boolean isFirstFromUp = usDriver.isFirstUpRising();
+    double dTheta = (isFirstFromUp) ?  215 - (secondAngle - firstAngle) /2  : 135 - ( secondAngle - firstAngle)/2;
     
     System.out.println(firstAngle + "     "+ secondAngle);
     System.out.println(dTheta);
@@ -48,9 +49,9 @@ public class Main {
     CircleTurningDriver.turnBy(dTheta);
     while (Button.waitForAnyPress() != Button.ID_ENTER);
     
-    CircleTurningDriver.moveStraightFor(TILE_SIZE-minDist   -2    );
+    CircleTurningDriver.moveStraightFor(TILE_SIZE-minDist   -15    );
     CircleTurningDriver.turnBy(90);
-    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist    -2    );
+    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist    -15    );
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
     } // do nothing
     
