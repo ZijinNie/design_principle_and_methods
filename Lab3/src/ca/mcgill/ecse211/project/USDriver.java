@@ -89,35 +89,58 @@ public class USDriver implements Runnable {
     secondAngle= 0;
     
     prev = readUsDistance();
-    while(!exit) {
+    int countNum = 0;
+    while(true) {
+      countNum ++;
       cur = readUsDistance();
+      if(cur == 0) cur = Double.MAX_VALUE;
       System.out.println(cur);
       
       if(cur<minDist && minDist>5) minDist = cur;
       
-      if(!isIn && lowzone<cur && cur<highzone) {
-        
-       if(prev > highzone) {
-            isEnterFromUp = true;
-            
-            if(count == 0) {isFirstUpRising = false;}
-       }else {
-         if(count == 0) {isFirstUpRising = true;}
-       }
-       isIn = true;
-       inAngle = Resources.odometer.getXyt()[2];
-        
-      }else if(isIn){
-        
-        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
+//      if(!isIn && lowzone<cur && cur<highzone) {
+//        
+//       if(prev > highzone) {
+//            isEnterFromUp = true;
+//            
+//            if(count == 0) {isFirstUpRising = false;}
+//       }else {
+//         if(count == 0) {isFirstUpRising = true;}
+//       }
+//       isIn = true;
+//       inAngle = Resources.odometer.getXyt()[2];
+//        
+//      }else if(isIn){
+//        
+//        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
+//          
+//          isIn = false;
+//          outAngle = Resources.odometer.getXyt()[2];
+//          
+//          if(count == 0) {
+//            Sound.beep();
+//            firstAngle = (inAngle + outAngle)/2;
+//            
+//          }else{
+//            secondAngle = Resources.odometer.getXyt()[2];
+//            CircleTurningDriver.stopMotors();
+//            stop();
+//          }
+//          count +=1;
+//        }
+//      }
+      if(countNum >20) {
+        if((cur < TURNING_THRESHOLD && TURNING_THRESHOLD < prev) ||
+            (cur > TURNING_THRESHOLD && TURNING_THRESHOLD > prev)) {
           
-          isIn = false;
-          outAngle = Resources.odometer.getXyt()[2];
           
           if(count == 0) {
+            if(prev < TURNING_THRESHOLD) {
+              isFirstUpRising = true;
+            }
             Sound.beep();
-            firstAngle = (inAngle + outAngle)/2;
-            
+            firstAngle = Resources.odometer.getXyt()[2];
+          
           }else{
             secondAngle = Resources.odometer.getXyt()[2];
             CircleTurningDriver.stopMotors();
@@ -126,6 +149,7 @@ public class USDriver implements Runnable {
           count +=1;
         }
       }
+      prev = cur;
       
       try {
         Thread.sleep(50); // make the sensor sampling frequency be 20/s

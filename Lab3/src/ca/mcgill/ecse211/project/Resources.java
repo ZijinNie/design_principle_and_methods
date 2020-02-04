@@ -76,11 +76,11 @@ public class Resources {
   /**
    * The limit of invalid samples that we read from the US sensor before assuming no obstacle.
    */
-  public static final int INVALID_SAMPLE_LIMIT = 20;
+  public static final int INVALID_SAMPLE_LIMIT = 5;
   
-  public static final float TURNING_THRESHOLD = 17;
+  public static final float TURNING_THRESHOLD = 50;
   
-  public static final float ZONE_THRESHOLD = (float) 1;
+  public static final float ZONE_THRESHOLD = (float) 50;
   
   /**
    * The odometer.
