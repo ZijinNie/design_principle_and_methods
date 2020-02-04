@@ -90,7 +90,7 @@ public class USDriver implements Runnable {
     
     prev = readUsDistance();
     int countNum = 0;
-    while(true) {
+    while(!exit) {
       countNum ++;
       cur = readUsDistance();
       if(cur == 0) cur = Double.MAX_VALUE;

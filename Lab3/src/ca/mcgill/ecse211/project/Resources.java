@@ -78,7 +78,7 @@ public class Resources {
    */
   public static final int INVALID_SAMPLE_LIMIT = 5;
   
-  public static final float TURNING_THRESHOLD = 50;
+  public static final float TURNING_THRESHOLD = 30;
   
   public static final float ZONE_THRESHOLD = (float) 50;
   

@@ -42,19 +42,25 @@ public class Main {
     
     System.out.println(firstAngle + "     "+ secondAngle);
     System.out.println(dTheta);
-
-    if(dTheta > 180) dTheta = dTheta - 360;
+    
+    if(dTheta > 180) {
+      dTheta = dTheta - 360;
+    }else {
+      dTheta -=7;
+    }
     
     
     CircleTurningDriver.turnBy(dTheta);
     while (Button.waitForAnyPress() != Button.ID_ENTER);
     
-    CircleTurningDriver.turnBy(360);
+//    CircleTurningDriver.turnBy(360);
+    
     double minDist = usDriver.getMinDist();
-    System.out.println("Forward" + (TILE_SIZE-minDist-15));
-    CircleTurningDriver.moveStraightFor(TILE_SIZE-minDist   -15    );
+    System.out.println("Forward" + (TILE_SIZE-minDist-5));
+    
+    CircleTurningDriver.moveStraightFor(TILE_SIZE-minDist   -3    );
     CircleTurningDriver.turnBy(90);
-    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist    -15    );
+    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist    -3    );
     CircleTurningDriver.turnBy(-90);
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
     } // do nothing
