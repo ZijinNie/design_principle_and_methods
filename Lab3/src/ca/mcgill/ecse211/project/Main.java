@@ -8,6 +8,7 @@ import ca.mcgill.ecse211.project.USDriver;
 /**
  * The main driver class for the lab.
  */
+
 public class Main {
   /**
    * The main entry point.
@@ -16,52 +17,68 @@ public class Main {
    */
   public static void main(String[] args) {
 
-    
-    Sound.beep();
-    USDriver usDriver= new USDriver();
+    //Create threads for USDriver and Odometer
+    USDriver usDriver = new USDriver();
     Thread usThread = new Thread(usDriver);
     Thread odo = new Thread(Resources.odometer);
     
+    //Wait enter button pressed to start
     while(Button.waitForAnyPress() != Button.ID_ENTER);
     
+    //start USDriver, Odometer and Dispay threads
     usThread.start();
     odo.start(); 
     new Thread(new Display()).start();
     
+    //Set rotate speed
     leftMotor.setSpeed(ROTATE_SPEED);
     rightMotor.setSpeed(ROTATE_SPEED);
     
-//    CircleTurningDriver.turnBy(360);
+    //let robot rotate clockwise
     CircleTurningDriver.rotateClockwise();
-
+    
+    //wait USDriver stops
     while(!usDriver.isExit());
+    
+    //thread sleeps for one second
     sleepFor(1000);
+    
+    //get angles of first and second time of swiping through D
     double firstAngle = usDriver.getFirstAngle(), secondAngle= usDriver.getSecondAngle();
+    
     boolean isFirstFromUp = usDriver.isFirstUpRising();
+    
+    //calculate dTheta based on the rising/falling edge of first D distance
     double dTheta = (isFirstFromUp) ?  315 - (secondAngle - firstAngle) /2  : 135 - ( secondAngle - firstAngle)/2;
     
-    System.out.println(firstAngle + "     "+ secondAngle);
-    System.out.println(dTheta);
+    //angle correct
+    int correction = -7;
     
+    //rotate to counter clockwise if angle greater than 180
     if(dTheta > 180) {
       dTheta = dTheta - 360;
-    }else {
-      dTheta -=7;
+    } else {
+      dTheta += correction;     //add correction
     }
     
-    
+    //turn to 0 degree
     CircleTurningDriver.turnBy(dTheta);
+    
+    //wait for button press to go to (1,1)
     while (Button.waitForAnyPress() != Button.ID_ENTER);
     
-//    CircleTurningDriver.turnBy(360);
-    
+    //get minimum distance from USSensor
     double minDist = usDriver.getMinDist();
-    System.out.println("Forward" + (TILE_SIZE-minDist-5));
     
-    CircleTurningDriver.moveStraightFor(TILE_SIZE-minDist   -3    );
+    //Correction made due to the horizontal distance difference of US sensor and wheel base 
+    double distanceCorrection = 3;
+    //Moving to (1,1)
+    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist - distanceCorrection);
     CircleTurningDriver.turnBy(90);
-    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist    -3    );
+    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist - distanceCorrection);
     CircleTurningDriver.turnBy(-90);
+    
+    //wait for exit
     while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
     } // do nothing
     

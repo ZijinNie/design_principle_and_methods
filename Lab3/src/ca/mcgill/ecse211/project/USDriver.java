@@ -58,7 +58,6 @@ public class USDriver implements Runnable {
   
   private volatile double minDist;
   
-  private volatile double curDist;
   
   private double firstAngle, secondAngle;
   private boolean isFirstUpRising;
@@ -74,128 +73,126 @@ public class USDriver implements Runnable {
    */
   public void run() {
     
-    minDist = Double.MAX_VALUE;
-    double cur;
-    double prev;
-    int count = 0;
-    double highzone = TURNING_THRESHOLD + ZONE_THRESHOLD;
-    double lowzone = TURNING_THRESHOLD - ZONE_THRESHOLD;
-//    double highzone = 75;
-//    double lowzone = 65;
-    double inAngle = 0 , outAngle = 0;
-    boolean isIn = false;
-    boolean isEnterFromUp = false;
-    firstAngle = 0;
+    minDist = Double.MAX_VALUE; //initialized mindist to max value
+    double cur; //current distance 
+    double prev;    //previous distance
+    int count = 0;  //count of occurrence of distance D
+    double highzone = TURNING_THRESHOLD + ZONE_THRESHOLD;   //high threshold
+    double lowzone = TURNING_THRESHOLD - ZONE_THRESHOLD;    //low threshold
+
+    double inAngle = 0 , outAngle = 0;  //angle when enter a threshold
+    boolean isIn = false;   ////angle when leave a threshold
+    boolean isEnterFromUp = false;  //if enter from above
+    firstAngle = 0; 
     secondAngle= 0;
     
-    prev = readUsDistance();
+    prev = readUsDistance();    //initialize prev
     int countNum = 0;
+    
+    //loop until is it exits
     while(!exit) {
-      countNum ++;
-      cur = readUsDistance();
-      if(cur == 0) cur = Double.MAX_VALUE;
-      System.out.println(cur);
       
+      countNum ++;
+      
+      cur = readUsDistance();
+      
+      // treat 0 reading as infinite far
+      if(cur == 0) cur = Double.MAX_VALUE;
+
+      //refresh mindist
       if(cur<minDist && minDist>5) minDist = cur;
       
-//      if(!isIn && lowzone<cur && cur<highzone) {
-//        
-//       if(prev > highzone) {
-//            isEnterFromUp = true;
-//            
-//            if(count == 0) {isFirstUpRising = false;}
-//       }else {
-//         if(count == 0) {isFirstUpRising = true;}
-//       }
-//       isIn = true;
-//       inAngle = Resources.odometer.getXyt()[2];
-//        
-//      }else if(isIn){
-//        
-//        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
-//          
-//          isIn = false;
-//          outAngle = Resources.odometer.getXyt()[2];
-//          
-//          if(count == 0) {
-//            Sound.beep();
-//            firstAngle = (inAngle + outAngle)/2;
-//            
-//          }else{
-//            secondAngle = Resources.odometer.getXyt()[2];
-//            CircleTurningDriver.stopMotors();
-//            stop();
-//          }
-//          count +=1;
-//        }
-//      }
-      if(countNum >20) {
-        if((cur < TURNING_THRESHOLD && TURNING_THRESHOLD < prev) ||
-            (cur > TURNING_THRESHOLD && TURNING_THRESHOLD > prev)) {
+      //when entering the threshold zone
+      if(!isIn && lowzone<cur && cur<highzone) {
+       
+        //enter from rising edge
+       if(prev > highzone) {
+            isEnterFromUp = true;
+            if(count == 0) {isFirstUpRising = false;}
+       //enter from falling edge
+       }else {
+         if(count == 0) {isFirstUpRising = true;}
+       }
+       isIn = true;
+       inAngle = Resources.odometer.getXyt()[2];
+        
+      
+      }else if(isIn){
+        
+        //leaving the threshold zone
+        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
           
+          isIn = false;
+          outAngle = Resources.odometer.getXyt()[2];
           
+          //the first occurence
           if(count == 0) {
-            if(prev < TURNING_THRESHOLD) {
-              isFirstUpRising = true;
-            }
             Sound.beep();
-            firstAngle = Resources.odometer.getXyt()[2];
-          
+            firstAngle = (inAngle + outAngle)/2;
+            
+          //the second occurence
           }else{
             secondAngle = Resources.odometer.getXyt()[2];
             CircleTurningDriver.stopMotors();
             stop();
           }
-          count +=1;
+          count +=1;    //increament counter
         }
-      }
-      prev = cur;
-      
-      try {
-        Thread.sleep(50); // make the sensor sampling frequency be 20/s
-      } catch (InterruptedException e) {
-      }
-      
+      } 
     }
-    
-    
   }
-
+  
+  /**
+   * Get if the US sensor is stopped now
+   * @return if the US sensor is stopped
+   */
   public boolean isExit() {
     return exit;
   }
-
-
-  public void setExit(boolean exit) {
-    this.exit = exit;
-  }
-
-
+  /**
+   * Return the first angle
+   * @return the first angle
+   */
   public double getFirstAngle() {
     return firstAngle;
   }
 
-
+  /**
+   * Set the first angle
+   * @param firstAngle the first angle
+   */
   public void setFirstAngle(double firstAngle) {
     this.firstAngle = firstAngle;
   }
 
-
+  /**
+   * Get the second angle
+   * @return the second angle
+   */
   public double getSecondAngle() {
     return secondAngle;
   }
 
-
+  /**
+   * Set the second angle
+   * @param secondAngle the second angle
+   */
   public void setSecondAngle(double secondAngle) {
     this.secondAngle = secondAngle;
   }
 
-
+  /**
+   * Get the minimum distance red by US sensor
+   * @return Get the minimum distance red by US sensor
+   */
   public double getMinDist() {
     return minDist;
   }
 
-
+  /**
+   * Set the minimum distance red by US sensor
+   * @param minDist Set the minimum distance red by US sensor
+   */
   public void setMinDist(double minDist) {
     this.minDist = minDist;
   }
@@ -233,50 +230,25 @@ public class USDriver implements Runnable {
     }
   }
 
-  
+  /**
+   * Set the stopping status of USDriver to true
+   */
   public void stop() {
     exit = true;
   }
 
-
-
-  public double getCurDist() {    
-    double cur = 0;
-    lock.lock();
-    try {
-      while (isResetting) { // If a reset operation is being executed, wait until it is over.
-        doneResetting.await(); // Using await() is lighter on the CPU than simple busy wait.
-      }
-      cur = curDist;
-        
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    } finally {
-      lock.unlock();
-    }
-
-      return cur;
-  }
-
-
-  public void setCurDist(double dist) {
-    lock.lock();
-    isResetting = true;
-    try {
-      this.curDist = dist;
-      isResetting = false;
-      doneResetting.signalAll();
-    } finally {
-      lock.unlock();
-    }
-  }
-
-
+  /**
+   * return if the first occurrence of distance D is rising edge
+   * @return if the first occurrence of distance D is rising edge
+   */
   public boolean isFirstUpRising() {
     return isFirstUpRising;
   }
 
-
+  /**
+   * set if the first occurrence of distance D is rising edge
+   * @param isFirstUpRising if the first occurrence of distance D is rising edge
+   */
   public void setFirstUpRising(boolean isFirstUpRising) {
     this.isFirstUpRising = isFirstUpRising;
   }

@@ -78,9 +78,15 @@ public class Resources {
    */
   public static final int INVALID_SAMPLE_LIMIT = 5;
   
+  /**
+   * The distance limit for detecting a wall
+   */
   public static final float TURNING_THRESHOLD = 30;
   
-  public static final float ZONE_THRESHOLD = (float) 50;
+  /**
+   * The error threshold for distance limit
+   */
+  public static final float ZONE_THRESHOLD = (float) 2;
   
   /**
    * The odometer.

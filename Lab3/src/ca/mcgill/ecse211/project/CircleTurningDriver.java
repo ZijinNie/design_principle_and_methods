@@ -6,51 +6,13 @@ import static ca.mcgill.ecse211.project.Resources.*;
 /**
  * This class is used to drive the robot on the demo floor.
  */
-public class CircleTurningDriver{
+public class CircleTurningDriver {
 
-  private volatile boolean isStopped;
-  private volatile boolean startHeadingDes;
-  private volatile int turningAngle;
-  private volatile float xDistance;
-  private volatile float yDistance;
+
    
   /**
-   * Drives the robot in a square of size 3x3 Tiles. It is to be run in parallel
-   * with the odometer thread to allow testing its functionality.
-   */
-
-//   public void run() {
-//       startHeadingDes = false;
-//        // reset the motors
-//       stopMotors();
-//       setAcceleration(ACCELERATION);
-//
-//       // Sleep for 2 seconds
-////       sleepFor(TIMEOUT_PERIOD);
-//
-////       setSpeed(FORWARD_SPEED);
-////       moveStraightFor(3);
-//
-//       // turn 90 degrees clockwise
-//       setSpeed(ROTATE_SPEED);
-//       leftMotor.forward();
-//       rightMotor.backward();
-////       turnBy(360.0);
-//       setStopped(true);
-//       while(!startHeadingDes);
-//       
-//       if(turningAngle>180) {
-//         turnBy(360-turningAngle);
-//       }
-//       else turnBy(turningAngle);
-//       
-//       
-//       moveStraightFor(yDistance);
-//       turnBy(90);
-//       moveStraightFor(xDistance);
-//       turnBy(-90);
-//   }
-   
+   * Rotate the robot continuously clockwise.
+   */ 
   public static void rotateClockwise() {
     stopMotors();
     setAcceleration(ACCELERATION);
@@ -59,24 +21,7 @@ public class CircleTurningDriver{
     rightMotor.backward();
   }
   
-  public int getTurningAngle() {
-    return turningAngle;
-  }
-  public void setTurningAngle(int turningAngle) {
-    this.turningAngle = turningAngle;
-  }
-  public float getxDistance() {
-    return xDistance;
-  }
-  public void setxDistance(float xDistance) {
-    this.xDistance = xDistance;
-  }
-  public float getyDistance() {
-    return yDistance;
-  }
-  public void setyDistance(float yDistance) {
-    this.yDistance = yDistance;
-  }
+  
   /**
    * Moves the robot straight for the given distance.
    * 
@@ -87,6 +32,11 @@ public class CircleTurningDriver{
     rightMotor.rotate(convertDistance(distance * TILE_SIZE), false);
   }
   
+  /**
+   * Moves the robot straight for the given distance.
+   * 
+   * @param distance in cm, may be negative
+   */
   public static void moveStraightFor(double distance) {
     leftMotor.rotate(convertDistance(distance), true);
     rightMotor.rotate(convertDistance(distance), false);
@@ -163,18 +113,6 @@ public class CircleTurningDriver{
     leftMotor.setAcceleration(acceleration);
     rightMotor.setAcceleration(acceleration);
   }
-  public boolean isStopped() {
-    return isStopped;
-  }
-  public void setStopped(boolean isStopped) {
-    this.isStopped = isStopped;
-  }
-  public boolean isStartHeadingDes() {
-    return startHeadingDes;
-  }
-  public void setStartHeadingDes(boolean startHeadingDes) {
-    this.startHeadingDes = startHeadingDes;
-  }
-  
+
   
 }
