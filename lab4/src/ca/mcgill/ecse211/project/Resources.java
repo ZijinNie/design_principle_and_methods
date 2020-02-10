@@ -35,7 +35,7 @@ public class Resources {
   /**
    * The speed at which the robot rotates in degrees per second.
    */
-  public static final int ROTATE_SPEED = 50;
+  public static final int ROTATE_SPEED = 30;
   
   /**
    * The motor acceleration in degrees per second squared.
@@ -97,15 +97,15 @@ public class Resources {
   /**
    * The Ultrasonic Sensor
    */
-  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
+//  public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S1);
   
   /**
    * 
    */
-  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S2);
+  public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S4);
   
-  public static final int LOW_DENSITY_LIMIT = 10;
+  public static final int LOW_DENSITY_LIMIT = 3;
   
-  public static final double LIGHT_RADIUS = 5;
+  public static final double LIGHT_RADIUS = 15;
   
 }

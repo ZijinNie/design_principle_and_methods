@@ -5,6 +5,8 @@ import lejos.hardware.Sound;
 import lejos.internal.ev3.EV3Audio;
 import static ca.mcgill.ecse211.project.Resources.*;
 import ca.mcgill.ecse211.project.USDriver;
+import ca.mcgill.ecse211.project.CircleTurningDriver;
+
 /**
  * The main driver class for the lab.
  */
@@ -16,70 +18,75 @@ public class Main {
    * @param args not used
    */
   public static void main(String[] args) {
-
+	 ColorSensor colorSensorController = new ColorSensor();
+	 Thread odo = new Thread(Resources.odometer);
+	 Thread csThread = new Thread(colorSensorController);    
+	 while(Button.waitForAnyPress() != Button.ID_ENTER);	  
+	 odo.start();
+	 CircleTurningDriver.rotateClockwise();
+	 System.out.println("Start rotating");
+	 csThread.run();
+	 
+	 while(Button.waitForAnyPress() != Button.ID_ENTER);	  
+	 Navigation.travelTo(1, 2);
+	 Navigation.travelTo(2, 2);
+	 Navigation.travelTo(3, 3);
+	 Navigation.travelTo(3, 2);
+	 Navigation.travelTo(2, 1);
+	 
+//	 boolean isOnLine = false;
+//	 boolean preOnLine= false;
+//	 double[] angles = new double[4];
+//	 int count = 0;
+//	 while(true) {
+//		 isOnLine = colorSensorController.isOnLine();
+//		 System.out.println("Count: " + count);
+//		 if(!preOnLine && isOnLine) {
+//			 angles[count] = odometer.getXyt()[2];
+//			 if(count ==3) {
+//				 CircleTurningDriver.stopMotors();
+//				 break;
+//			 }
+//			 count ++;
+//		 }
+//		 preOnLine = isOnLine;
+//		 sleepFor(10);
+//	 }
+//	 
+//	 double deltax = LIGHT_RADIUS * Math.cos((angles[3] - angles[1])/2);
+//	 
+//	 double deltay = LIGHT_RADIUS * Math.cos((angles[2] - angles[0])/2);
+//
+//	 double thetay = angles[3] - angles[1];
+//	 
+//	 CircleTurningDriver.turnBy(90 - thetay/2);
+//	 
+//	 CircleTurningDriver.moveStraightFor(deltay);
+//	 CircleTurningDriver.turnBy(90);
+//	 CircleTurningDriver.moveStraightFor(-deltax);
+//	 CircleTurningDriver.turnBy(-90);
+	  
+//	  ColorSensor colorSensor=new ColorSensor();
+//	  
+//	  Thread colorSensorThread = new Thread(colorSensor);
+//	  
+//	  colorSensorThread.run();
     //Create threads for USDriver and Odometer
-    USDriver usDriver = new USDriver();
-    Thread usThread = new Thread(usDriver);
-    Thread odo = new Thread(Resources.odometer);
-    
-    //Wait enter button pressed to start
-    while(Button.waitForAnyPress() != Button.ID_ENTER);
-    
-    //start USDriver, Odometer and Dispay threads
-    usThread.start();
-    odo.start(); 
-    new Thread(new Display()).start();
-    
-    //Set rotate speed
-    leftMotor.setSpeed(ROTATE_SPEED);
-    rightMotor.setSpeed(ROTATE_SPEED);
-    
-    //let robot rotate clockwise
-    CircleTurningDriver.rotateClockwise();
-    
-    //wait USDriver stops
-    while(!usDriver.isExit());
-    
-    //thread sleeps for one second
-    sleepFor(1000);
-    
-    //get angles of first and second time of swiping through D
-    double firstAngle = usDriver.getFirstAngle(), secondAngle= usDriver.getSecondAngle();
-    
-    boolean isFirstFromUp = usDriver.isFirstUpRising();
-    
-    //calculate dTheta based on the rising/falling edge of first D distance
-    double dTheta = (isFirstFromUp) ?  315 - (secondAngle - firstAngle) /2  : 135 - ( secondAngle - firstAngle)/2;
-    
-    //angle correct
-    int correction = -7;
-    
-    //rotate to counter clockwise if angle greater than 180
-    if(dTheta > 180) {
-      dTheta = dTheta - 360;
-    } else {
-      dTheta += correction;     //add correction
-    }
-    
-    //turn to 0 degree
-    CircleTurningDriver.turnBy(dTheta);
-    
-    //wait for button press to go to (1,1)
-    while (Button.waitForAnyPress() != Button.ID_ENTER);
-    
-    //get minimum distance from USSensor
-    double minDist = usDriver.getMinDist();
-    
-    //Correction made due to the horizontal distance difference of US sensor and wheel base 
-    double distanceCorrection = 3;
-    //Moving to (1,1)
-    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist - distanceCorrection);
-    CircleTurningDriver.turnBy(90);
-    CircleTurningDriver.moveStraightFor(TILE_SIZE - minDist - distanceCorrection);
-    CircleTurningDriver.turnBy(-90);
-    
+//    USDriver usDriver = new USDriver();
+//    Thread usThread = new Thread(usDriver);
+//    Thread odo = new Thread(Resources.odometer);
+//    
+//    //Wait enter button pressed to start
+//    while(Button.waitForAnyPress() != Button.ID_ENTER);
+//    
+//    //start USDriver, Odometer and Dispay threads
+//    usThread.start();
+//    odo.start(); 
+//    new Thread(new Display()).start();
+
+//    
     //wait for exit
-    while (Button.waitForAnyPress() != Button.ID_ESCAPE) {
+    while (Button.waitForAnyPress() != Button.ID_ALL) {
     } // do nothing
     
     System.exit(0);
@@ -102,8 +109,8 @@ public class Main {
 	  double theta = (secondAngle - firstAngle)/2;
 	  double dx = LIGHT_RADIUS * Math.cos(theta);
 	  if(firstAngle > 180) {
-		  return dx;
-	  }else return -dx;
+		  return -dx;
+	  }else return dx;
   }
   
   public double calculateDeltaY(double firstAngle, double secondAngle) {
@@ -113,7 +120,77 @@ public class Main {
 	  else return -LIGHT_RADIUS * Math.cos((firstAngle - secondAngle)/2);
   }
   
-  public void moveTo(int x, int y) {
+  public void displacementCorrection(double deltax, double deltay) {
 	  
+	  CircleTurningDriver.moveStraightFor(-deltay);
+	  CircleTurningDriver.turnBy(90);
+	  CircleTurningDriver.moveStraightFor(-deltax);
+	  CircleTurningDriver.turnBy(-90);
   }
+  
+  
+  public void turnTo(double angle) {
+	  double[] position = odometer.getXyt();
+	  double theta = position[2];
+	  double dTheta;
+	  if(angle >theta) {
+		  dTheta = angle -theta;
+		  if (dTheta > 180) {
+			  CircleTurningDriver.turnBy(360- dTheta);
+		  }else {
+			  CircleTurningDriver.turnBy( -dTheta);
+		  }
+		  
+	  }else {
+		  dTheta = theta - angle;
+		  if (dTheta > 180) {
+			  CircleTurningDriver.turnBy(dTheta - 360);
+		  }else {
+			  CircleTurningDriver.turnBy(dTheta);
+		  }
+	  }
+  }
+  
+  public void localize() {
+	 CircleTurningDriver.rotateClockwise();
+	 ColorSensor colorSensorController = new ColorSensor();
+	 Thread csThread = new Thread(colorSensorController);
+	 csThread.run();
+	 boolean isOnLine = false;
+	 boolean preOnLine= false;
+	 double[] angles = new double[4];
+	 int count = 0;
+	 while(true) {
+		 isOnLine = colorSensorController.isOnLine();
+		 if(!preOnLine && isOnLine) {
+			 angles[count] = odometer.getXyt()[2];
+			 if(count ==3) {
+				 CircleTurningDriver.stopMotors();
+				 break;
+			 }
+			 
+		 }
+		 sleepFor(20);
+	 }
+	 
+	 double deltax = calculateDeltaX(angles[1], angles[3]);
+	 double deltay = calculateDeltaY(angles[0], angles[2]);
+	 
+	 double thetay = angles[3] - angles[1];
+	 
+	 CircleTurningDriver.turnBy(90 - thetay/2);
+	 
+	 CircleTurningDriver.moveStraightFor(-deltay);
+	 CircleTurningDriver.turnBy(90);
+	 CircleTurningDriver.moveStraightFor(-deltax);
+	 CircleTurningDriver.turnBy(-90);
+	 
+  }
+  
+//  public static void 
+  
+  
+  
+  
+//  public void a
 }

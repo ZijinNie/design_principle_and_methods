@@ -73,73 +73,89 @@ public class USDriver implements Runnable {
    */
   public void run() {
     
-    minDist = Double.MAX_VALUE; //initialized mindist to max value
-    double cur; //current distance 
-    double prev;    //previous distance
-    int count = 0;  //count of occurrence of distance D
-    double highzone = TURNING_THRESHOLD + ZONE_THRESHOLD;   //high threshold
-    double lowzone = TURNING_THRESHOLD - ZONE_THRESHOLD;    //low threshold
-
-    double inAngle = 0 , outAngle = 0;  //angle when enter a threshold
-    boolean isIn = false;   ////angle when leave a threshold
-    boolean isEnterFromUp = false;  //if enter from above
-    firstAngle = 0; 
-    secondAngle= 0;
-    
-    prev = readUsDistance();    //initialize prev
-    int countNum = 0;
-    
-    //loop until is it exits
-    while(!exit) {
-      
-      countNum ++;
-      
-      cur = readUsDistance();
-      
-      // treat 0 reading as infinite far
-      if(cur == 0) cur = Double.MAX_VALUE;
-
-      //refresh mindist
-      if(cur<minDist && minDist>5) minDist = cur;
-      
-      //when entering the threshold zone
-      if(!isIn && lowzone<cur && cur<highzone) {
-       
-        //enter from rising edge
-       if(prev > highzone) {
-            isEnterFromUp = true;
-            if(count == 0) {isFirstUpRising = false;}
-       //enter from falling edge
-       }else {
-         if(count == 0) {isFirstUpRising = true;}
-       }
-       isIn = true;
-       inAngle = Resources.odometer.getXyt()[2];
-        
-      
-      }else if(isIn){
-        
-        //leaving the threshold zone
-        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
-          
-          isIn = false;
-          outAngle = Resources.odometer.getXyt()[2];
-          
-          //the first occurence
-          if(count == 0) {
-            Sound.beep();
-            firstAngle = (inAngle + outAngle)/2;
-            
-          //the second occurence
-          }else{
-            secondAngle = Resources.odometer.getXyt()[2];
-            CircleTurningDriver.stopMotors();
-            stop();
-          }
-          count +=1;    //increament counter
-        }
-      } 
-    }
+	    minDist = Double.MAX_VALUE;
+	    double cur;
+	    double prev;
+	    int count = 0;
+	    double highzone = TURNING_THRESHOLD + ZONE_THRESHOLD;
+	    double lowzone = TURNING_THRESHOLD - ZONE_THRESHOLD;
+//	    double highzone = 75;
+//	    double lowzone = 65;
+	    double inAngle = 0 , outAngle = 0;
+	    boolean isIn = false;
+	    boolean isEnterFromUp = false;
+	    firstAngle = 0;
+	    secondAngle= 0;
+	    
+	    prev = readUsDistance();
+	    int countNum = 0;
+	    while(true) {
+	      countNum ++;
+	      cur = readUsDistance();
+	      if(cur == 0) cur = Double.MAX_VALUE;
+	      System.out.println(cur);
+	      
+	      if(cur<minDist && minDist>5) minDist = cur;
+	      
+//	      if(!isIn && lowzone<cur && cur<highzone) {
+//	        
+//	       if(prev > highzone) {
+//	            isEnterFromUp = true;
+//	            
+//	            if(count == 0) {isFirstUpRising = false;}
+//	       }else {
+//	         if(count == 0) {isFirstUpRising = true;}
+//	       }
+//	       isIn = true;
+//	       inAngle = Resources.odometer.getXyt()[2];
+//	        
+//	      }else if(isIn){
+//	        
+//	        if((cur< lowzone && isEnterFromUp) || (cur> highzone && !isEnterFromUp)) {
+//	          
+//	          isIn = false;
+//	          outAngle = Resources.odometer.getXyt()[2];
+//	          
+//	          if(count == 0) {
+//	            Sound.beep();
+//	            firstAngle = (inAngle + outAngle)/2;
+//	            
+//	          }else{
+//	            secondAngle = Resources.odometer.getXyt()[2];
+//	            CircleTurningDriver.stopMotors();
+//	            stop();
+//	          }
+//	          count +=1;
+//	        }
+//	      }
+	      if(countNum >20) {
+	        if((cur < TURNING_THRESHOLD && TURNING_THRESHOLD < prev) ||
+	            (cur > TURNING_THRESHOLD && TURNING_THRESHOLD > prev)) {
+	          
+	          
+	          if(count == 0) {
+	            if(prev < TURNING_THRESHOLD) {
+	              isFirstUpRising = true;
+	            }
+	            Sound.beep();
+	            firstAngle = Resources.odometer.getXyt()[2];
+	          
+	          }else{
+	            secondAngle = Resources.odometer.getXyt()[2];
+	            CircleTurningDriver.stopMotors();
+	            stop();
+	          }
+	          count +=1;
+	        }
+	      }
+	      prev = cur;
+	      
+	      try {
+	        Thread.sleep(50); // make the sensor sampling frequency be 20/s
+	      } catch (InterruptedException e) {
+	      }
+	      
+	    }
   }
   
   /**
