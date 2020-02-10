@@ -42,6 +42,7 @@ public class ColorSensor implements Runnable {
 		boolean preOnLine= false;
 		 boolean isOnLine = false;
 		double[] angles = new double[4];
+		
 		int count = 0;
 		while(true) {
 			currentIntensity = readIntensity();
@@ -79,12 +80,12 @@ public class ColorSensor implements Runnable {
 
 		 double thetay = angles[3] - angles[1];
 		 
-		 CircleTurningDriver.turnBy(90 - thetay/2);
+		 CircleTurningDriver.turnBy(90 - thetay/2 -3);
 		 System.out.println("x" + deltax + "y" + deltay + " theta " + (90 - thetay/2));
 		 CircleTurningDriver.moveStraightFor(deltay+1);
 		 CircleTurningDriver.turnBy(90);
 		 CircleTurningDriver.moveStraightFor(deltax);
-		 CircleTurningDriver.turnBy(-93);
+		 CircleTurningDriver.turnBy(-90);
 		 odometer.setXyt(Resources.TILE_SIZE,Resources.TILE_SIZE , 0);
 	}
 	

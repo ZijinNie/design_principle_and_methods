@@ -25,7 +25,7 @@ public class Resources {
   /**
    * The robot width in centimeters.
    */
-  public static final double BASE_WIDTH = 14.50;
+  public static final double BASE_WIDTH = 14.6;
   
   /**
    * The speed at which the robot moves forward in degrees per second.

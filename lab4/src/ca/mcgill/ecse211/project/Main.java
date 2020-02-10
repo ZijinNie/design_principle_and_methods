@@ -20,7 +20,7 @@ public class Main {
   public static void main(String[] args) {
 	 ColorSensor colorSensorController = new ColorSensor();
 	 Thread odo = new Thread(Resources.odometer);
-	 Thread csThread = new Thread(colorSensorController);    
+	 Thread csThread = new Thread(colorSensorController);     
 	 while(Button.waitForAnyPress() != Button.ID_ENTER);	  
 	 odo.start();
 	 CircleTurningDriver.rotateClockwise();
@@ -34,6 +34,8 @@ public class Main {
 	 Navigation.travelTo(3, 2);
 	 Navigation.travelTo(2, 1);
 	 
+	 Thread csThread2 = new Thread(colorSensorController);    
+	 csThread2.run();
 //	 boolean isOnLine = false;
 //	 boolean preOnLine= false;
 //	 double[] angles = new double[4];
@@ -129,27 +131,28 @@ public class Main {
   }
   
   
-  public void turnTo(double angle) {
-	  double[] position = odometer.getXyt();
-	  double theta = position[2];
-	  double dTheta;
-	  if(angle >theta) {
-		  dTheta = angle -theta;
-		  if (dTheta > 180) {
-			  CircleTurningDriver.turnBy(360- dTheta);
-		  }else {
-			  CircleTurningDriver.turnBy( -dTheta);
-		  }
-		  
-	  }else {
-		  dTheta = theta - angle;
-		  if (dTheta > 180) {
-			  CircleTurningDriver.turnBy(dTheta - 360);
-		  }else {
-			  CircleTurningDriver.turnBy(dTheta);
-		  }
-	  }
-  }
+//  public void turnTo(double angle) {
+//	  double[] position = odometer.getXyt();
+//	  double theta = position[2];
+//	  double dTheta;
+//	  System.out.println("theta is "+ theta + "angle is "+angle);
+//	  if(angle >theta) {
+//		  dTheta = angle -theta;
+//		  if (dTheta > 180) {
+//			  CircleTurningDriver.turnBy(360- dTheta);
+//		  }else {
+//			  CircleTurningDriver.turnBy( -dTheta);
+//		  }
+//		  
+//	  }else {
+//		  dTheta = theta - angle;
+//		  if (dTheta > 180) {
+//			  CircleTurningDriver.turnBy(dTheta - 360);
+//		  }else {
+//			  CircleTurningDriver.turnBy(dTheta);
+//		  }
+//	  }
+//  }
   
   public void localize() {
 	 CircleTurningDriver.rotateClockwise();
@@ -178,7 +181,7 @@ public class Main {
 	 
 	 double thetay = angles[3] - angles[1];
 	 
-	 CircleTurningDriver.turnBy(90 - thetay/2);
+	 CircleTurningDriver.turnBy(90 - thetay/2 - 1);
 	 
 	 CircleTurningDriver.moveStraightFor(-deltay);
 	 CircleTurningDriver.turnBy(90);
