@@ -33,7 +33,7 @@ public class Main {
 	 Navigation.travelTo(3, 3);
 	 Navigation.travelTo(3, 2);
 	 Navigation.travelTo(2, 1);
-	 
+	 csThread.run();
 //	 boolean isOnLine = false;
 //	 boolean preOnLine= false;
 //	 double[] angles = new double[4];

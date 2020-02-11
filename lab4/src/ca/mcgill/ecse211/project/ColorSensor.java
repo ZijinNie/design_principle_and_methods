@@ -46,9 +46,9 @@ public class ColorSensor implements Runnable {
 		while(true) {
 			currentIntensity = readIntensity();
 			isOnLine = isOnLine();
-			 System.out.println("Count: " + count);
+//			 System.out.println("Count: " + count);
 
-//			System.out.println("Inte: "+currentIntensity);
+			System.out.println("Inte: "+currentIntensity);
 			
 			setCurrentIntensity(currentIntensity);
 			
@@ -73,19 +73,27 @@ public class ColorSensor implements Runnable {
 		for (int i = 0; i < 4; i++) {
 			System.out.println(angles[i]);
 		}
-		double deltax = LIGHT_RADIUS * Math.cos( (angles[3] - angles[1])/2 * 0.0174533);
-		 
-		 double deltay = LIGHT_RADIUS * Math.cos( (angles[2] - angles[0])/2 * 0.0174533);
-
-		 double thetay = angles[3] - angles[1];
-		 
-		 CircleTurningDriver.turnBy(90 - thetay/2);
-		 System.out.println("x" + deltax + "y" + deltay + " theta " + (90 - thetay/2));
-		 CircleTurningDriver.moveStraightFor(deltay+1);
-		 CircleTurningDriver.turnBy(90);
-		 CircleTurningDriver.moveStraightFor(deltax);
-		 CircleTurningDriver.turnBy(-93);
-		 odometer.setXyt(Resources.TILE_SIZE,Resources.TILE_SIZE , 0);
+//		double deltax = LIGHT_RADIUS * Math.cos( (angles[3] - angles[1])/2 * 0.0174533);
+//		 
+//		 double deltay = LIGHT_RADIUS * Math.cos( (angles[2] - angles[0])/2 * 0.0174533);
+//
+//		 double thetay = angles[3] - angles[1];
+//		 
+//		 CircleTurningDriver.turnBy(90 - thetay/2);
+//		 System.out.println("x" + deltax + "y" + deltay + " theta " + (90 - thetay/2));
+//		 CircleTurningDriver.moveStraightFor(deltay+1);
+//		 CircleTurningDriver.turnBy(90);
+//		 CircleTurningDriver.moveStraightFor(deltax);
+//		 CircleTurningDriver.turnBy(-93);
+		double firstDistance = LIGHT_RADIUS * Math.cos( (angles[2] - angles[0])/2 * 0.0174533);
+		double secondDistance = LIGHT_RADIUS * Math.cos( (angles[3] - angles[1])/2 * 0.0174533);
+		double theta = (angles[2] > angles[0])? angles[2] - angles[1] : 360 - angles[0] + angles[2];
+		Navigation.turnTo(angles[0], Resources.odometer.getXyt()[2]);
+		if(theta < 180) {
+			CircleTurningDriver.turnBy(theta/2 -180);
+		}
+		else CircleTurningDriver.turnBy(theta/2);
+		odometer.setXyt(Resources.TILE_SIZE,Resources.TILE_SIZE , 0);
 	}
 	
 	public double readIntensity() {
