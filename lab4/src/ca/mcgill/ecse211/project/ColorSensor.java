@@ -86,14 +86,28 @@ public class ColorSensor implements Runnable {
 //		 CircleTurningDriver.turnBy(90);
 //		 CircleTurningDriver.moveStraightFor(deltax);
 //		 CircleTurningDriver.turnBy(-93);
-		double firstDistance = LIGHT_RADIUS * Math.cos( (angles[2] - angles[0])/2 * 0.0174533);
-		double secondDistance = LIGHT_RADIUS * Math.cos( (angles[3] - angles[1])/2 * 0.0174533);
-		double theta = (angles[2] > angles[0])? angles[2] - angles[1] : 360 - angles[0] + angles[2];
+		double theta1 = (angles[2] > angles[0])? angles[2] - angles[0] : 360 - angles[0] + angles[2];
+	    double theta2 = (angles[3] > angles[1])? angles[3] - angles[1] : 360 - angles[1] + angles[3];
+	    double theta1s = (theta1 > 180)? 360 - theta1 : theta1;
+        double theta2s = (theta2 > 180)? 360 - theta2 : theta2;
+		double firstDistance = LIGHT_RADIUS * Math.cos( theta1s/2 * 0.0174533);
+		double secondDistance = LIGHT_RADIUS * Math.cos( theta2s/2 * 0.0174533);
+		
+		double theta = theta1;
 		Navigation.turnTo(angles[0], Resources.odometer.getXyt()[2]);
 		if(theta < 180) {
 			CircleTurningDriver.turnBy(theta/2 -180);
+			System.out.println("Turn by " + (theta/2 - 180));
 		}
-		else CircleTurningDriver.turnBy(theta/2);
+		else {
+		  CircleTurningDriver.turnBy(theta/2);
+          System.out.println("Turn by " + theta/2 );
+		}
+		
+		CircleTurningDriver.moveStraightFor(firstDistance);
+      CircleTurningDriver.turnBy(90);
+      CircleTurningDriver.moveStraightFor(secondDistance);
+      CircleTurningDriver.turnBy(-90);
 		odometer.setXyt(Resources.TILE_SIZE,Resources.TILE_SIZE , 0);
 	}
 	
