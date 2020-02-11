@@ -80,8 +80,12 @@ public class CircleTurningDriver {
    * Stops both motors.
    */
   public static void stopMotors() {
+    leftMotor.setSpeed(0);
+    rightMotor.setSpeed(0);
     leftMotor.stop();
     rightMotor.stop();
+    leftMotor.setSpeed(Resources.ROTATE_SPEED);
+    rightMotor.setSpeed(Resources.ROTATE_SPEED);
   }
   
   /**

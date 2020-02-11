@@ -25,18 +25,18 @@ public class Navigation {
 		double targetAngle;
 		
 		if(deltaX == 0) targetAngle = 0;
-		if(deltaY == 0) targetAngle = (deltaX > 0)? 270 : 90; 
+		if(deltaY == 0) targetAngle = (deltaX > 0)? 90 : 270; 
 		
 		System.out.println("DeltaX is "+ deltaX + "deltaY is "+ deltaY);
 		
 		if(deltaX > 0) {
 			if (deltaY > 0) {
-				targetAngle = 360 - 57.3* Math.atan(deltaX/deltaY);
-			}else targetAngle = 180 +57.3* Math.atan(deltaX/(-deltaY)); 
+				targetAngle = 57.3* Math.atan(deltaX/deltaY);
+			}else targetAngle = 180 -57.3* Math.atan(deltaX/(-deltaY)); 
 		}else {
 			if (deltaY > 0) {
-				targetAngle = 57.3*Math.atan(-deltaX/deltaY);
-			}else targetAngle = 180 - 57.3*Math.atan(deltaX/deltaY); 
+				targetAngle = 360- 57.3*Math.atan(-deltaX/deltaY);
+			}else targetAngle = 180 + 57.3*Math.atan(deltaX/deltaY); 
 		}
 		
 		System.out.println("Target angle: "+ targetAngle + "Distance " + distance);
@@ -45,16 +45,25 @@ public class Navigation {
 	}
 	
 	public static void turnTo (double targetAngle, double currentAngle) {
-		double theta = targetAngle - currentAngle;
-		if(theta > 0) {
-			if(theta > 180) {
-				theta = theta - 360;
-			}
-		}else {
-			if( - theta > 180) {
-				theta = 360 + theta;
-			}
-		}
-		CircleTurningDriver.turnBy(-theta);
+	    double angle = targetAngle;
+	    double dTheta;
+		double theta = currentAngle;
+		System.out.println("angle" +angle+ " current angle " +theta );
+		if(angle >theta) {
+          dTheta = angle -theta;
+          if (dTheta > 180) {
+              CircleTurningDriver.turnBy(dTheta-360);
+          }else {
+              CircleTurningDriver.turnBy( dTheta);
+          }
+          
+      }else {
+          dTheta = theta - angle;
+          if (dTheta > 180) {
+              CircleTurningDriver.turnBy(360 - dTheta);
+          }else {
+              CircleTurningDriver.turnBy( - dTheta);
+          }
+      }
 	}
 }

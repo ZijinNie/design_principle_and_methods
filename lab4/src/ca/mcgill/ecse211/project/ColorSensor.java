@@ -1,3 +1,4 @@
+
 package ca.mcgill.ecse211.project;
 
 import static ca.mcgill.ecse211.project.Resources.INVALID_SAMPLE_LIMIT;
