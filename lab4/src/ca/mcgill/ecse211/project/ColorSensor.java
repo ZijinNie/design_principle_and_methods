@@ -17,6 +17,7 @@ public class ColorSensor implements Runnable {
 	private static final double INTENSITY_THRESHOLD = 13;
 	private int lowDensityCount;
 	private double currentIntensity;
+	private int time = 0;
 	
 	  // Thread control tools
 	  /**
@@ -39,6 +40,7 @@ public class ColorSensor implements Runnable {
 	
 	
 	public void run() {
+	    time ++;
 		double currentIntensity;
 		boolean preOnLine= false;
 		 boolean isOnLine = false;
@@ -96,18 +98,21 @@ public class ColorSensor implements Runnable {
 		double theta = theta1;
 		Navigation.turnTo(angles[0], Resources.odometer.getXyt()[2]);
 		if(theta < 180) {
-			CircleTurningDriver.turnBy(theta/2 -180);
+			CircleTurningDriver.turnBy(theta/2 -180 );
 			System.out.println("Turn by " + (theta/2 - 180));
 		}
 		else {
-		  CircleTurningDriver.turnBy(theta/2);
+		  CircleTurningDriver.turnBy(theta/2 );
           System.out.println("Turn by " + theta/2 );
 		}
 		
 		CircleTurningDriver.moveStraightFor(firstDistance);
-      CircleTurningDriver.turnBy(90);
-      CircleTurningDriver.moveStraightFor(secondDistance);
-      CircleTurningDriver.turnBy(-90);
+		if(time == 1) {
+	        CircleTurningDriver.turnBy(90);
+		}
+		else CircleTurningDriver.turnBy(-90);
+        CircleTurningDriver.moveStraightFor(secondDistance);
+        CircleTurningDriver.turnBy(-90);
 		odometer.setXyt(Resources.TILE_SIZE,Resources.TILE_SIZE , 0);
 	}
 	
@@ -157,6 +162,7 @@ public class ColorSensor implements Runnable {
 		      return false;
 		} else if((int)currentIntensity ==  INTENSITY_THRESHOLD && lowDensityCount >= Resources.LOW_DENSITY_LIMIT){
 			Sound.beep();
+			lowDensityCount = 0;
 		     return true;
 		}
 		else lowDensityCount = 0;

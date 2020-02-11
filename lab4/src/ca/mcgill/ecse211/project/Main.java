@@ -28,11 +28,11 @@ public class Main {
 	 csThread.run();
 	 
 	 while(Button.waitForAnyPress() != Button.ID_ENTER);	  
-	 Navigation.travelTo(3, 2);
+	 Navigation.travelTo(1, 3);
 	 Navigation.travelTo(2, 2);
-	 Navigation.travelTo(2, 3);
-	 Navigation.travelTo(3, 1);
-//	 Navigation.travelTo(2, 1);
+	 Navigation.travelTo(3, 3);
+	 Navigation.travelTo(3, 2);
+	 Navigation.travelTo(2, 1);
 	 CircleTurningDriver.rotateClockwise();
 	 csThread.run();
 //	 boolean isOnLine = false;
